@@ -7,12 +7,24 @@ This is wrapper for `systemd` service manager for [mina](https://github.com/mina
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mina-systemd', require: false
+gem 'mina-systemd', require: false, github: 'knockwaitknock/mina-systemd'
 ```
 
 And then execute:
+``` bash
+bundle install
+```
 
-    $ bundle
+And then
+``` bash
+mina staging systemctl:install
+```
+or
+``` bash
+mina production systemctl:install
+```
+
+This command will install systemd unit file to userpspace on your remote server.
 
 ## Usage
 
@@ -39,12 +51,48 @@ if you use zsh add noglob
 
 `noglob mina systemctl:status['puma']`
 
-## Contributing
+## Typical deploy config
+``` ruby
+require 'mina/systemd'
+require 'mina/multistage'
+require 'mina/bundler'
+require 'mina/rails'
+require 'mina/git'
+require 'mina/rbenv'
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/alexkojin/mina-systemd. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+set :deploy_to, '/home/www/app_name'
+set :repository, '...'
 
+set :shared_dirs, fetch(:shared_dirs, []).push('log', 'tmp', 'public/uploads', 'public/storage', 'pids')
+set :shared_files, fetch(:shared_files, []).push('config/database.yml')
 
-## License
+task :remote_environment do
+  invoke :'rbenv:load'
+end
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+desc "Deploys the current version to the server."
+task :deploy do
+  deploy do
+    invoke :'rbenv:load'
+    invoke :'git:clone'
+    invoke :'deploy:link_shared_paths'
+    invoke :'bundle:install'
+    invoke :'rails:db_migrate'
+    invoke :'deploy:cleanup'
+
+    on :launch do
+      invoke :'rbenv:load'
+      invoke :'systemctl:restart', 'puma'
+    end
+  end
+
+end
+
+```
+
+To control puma daemon from remote server cli please add `--user` parameter to systemctl call:
+``` bash
+systemctl --user restart puma
+```
+
 
