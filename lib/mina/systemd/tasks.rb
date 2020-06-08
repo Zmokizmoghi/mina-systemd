@@ -9,16 +9,19 @@ set :service_unit_name, "puma.service"
 namespace :systemctl do
   desc "Start a systemd service"
   task :start, [:service] do |t, args|
-    command %[sudo #{ fetch(:systemctl_command) } start #{args[:service]}]
+    comment %{Start #{args[:service]} service}
+    command %[#{ fetch(:systemctl_command) } start #{args[:service]}]
   end
 
   desc "Restart a systemd service"
   task :restart, [:service] do |t, args|
+    comment %{Restart #{args[:service]} service}
     command %[#{ fetch(:systemctl_command) } restart #{args[:service]}]
   end
 
   desc "Stop a systemd service"
   task :stop, [:service] do |t, args|
+    comment %{Stop #{args[:service]} service}
     command %[#{ fetch(:systemctl_command) } stop #{args[:service]}]
   end
 
