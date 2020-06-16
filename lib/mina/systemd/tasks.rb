@@ -38,16 +38,13 @@ Description=Puma HTTP Server
 After=network.target
 [Service]
 Type=simple
-StandardOutput=append:#{fetch(:deploy_to)}/shared/log/puma.stdout.log
-StandardError=append:#{fetch(:deploy_to)}/shared/log/puma.sterr.log
 WorkingDirectory=#{fetch(:deploy_to)}/current
 Environment=RAILS_ENV=#{fetch(:rails_env)}
 ExecStart=/home/#{fetch(:user)}/.rbenv/bin/rbenv exec bundle exec puma
-ExecStop=/home/#{fetch(:user)}/.rbenv/bin/rbenv exec bundle exec pumactl -S #{fetch(:deploy_to)}/shared/tmp/sockets/puma.state stop
 Restart=always
 RestartSec=5
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 }
 
     systemd_path = fetch(:service_unit_path, fetch_systemd_unit_path)
