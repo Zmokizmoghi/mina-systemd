@@ -24,6 +24,11 @@ or
 mina production systemctl:install
 ```
 
+Also do not forget to run
+``` bash
+  loginctl enable-linger www
+```
+
 This command will install systemd unit file to userpspace on your remote server.
 
 ## Usage
