@@ -43,8 +43,12 @@ Environment=RAILS_ENV=#{fetch(:rails_env)}
 ExecStart=/home/#{fetch(:user)}/.rbenv/bin/rbenv exec bundle exec puma
 Restart=always
 RestartSec=5
+KillMode=process
+PIDFile=#{fetch(:deploy_to)}/shared/tmp/pids/puma.pid
+
 [Install]
 WantedBy=default.target
+
 }
 
     systemd_path = fetch(:service_unit_path, fetch_systemd_unit_path)
